@@ -49,7 +49,7 @@ for n = 1:kmax
     En0(n) = pi^2*n^2./nb.^2;
 end
 
-[Psi,En] = Eigen(H,kmax);
+[~,En] = Eigen(H,kmax);
 
 % this is the normalized k-vector kn/pi
 kn = (1:1:kmax)./10;
@@ -101,7 +101,7 @@ Psi = (Cn.')* (Phi.');
 Phi = 0.6.*sqrt(L/2).*boxModes(x,L,16);
 
 figure;     % Psi1
-plot(x,-Psi(1,:),'LineWidth',1.5); hold on;
+plot(x,Psi(1,:),'LineWidth',1.5); hold on;
 plot(x,Phi(:,1),'--','LineWidth',1.5); hold off;
 title('Eigenfunctions and periodic expansion functions');
 ylabel('$\psi_{1} , \varphi_{1}$','Interpreter','latex');
@@ -119,7 +119,7 @@ legend('$\psi_{9}(x)$','$\varphi_{9}(x)$','Interpreter','latex');
 set(gca,'FontSize',15);
 
 figure;     % Psi10
-plot(x,-Psi(10,:),'LineWidth',1.5); hold on;
+plot(x,Psi(10,:),'LineWidth',1.5); hold on;
 plot(x,Phi(:,10),'--','LineWidth',1.5); hold off;
 title('Eigenfunctions and periodic expansion functions');
 ylabel('$\psi_{10} , \varphi_{10}$','Interpreter','latex');
@@ -161,12 +161,13 @@ for p = 1:N
     d(p) = trapz(x,conj(Psi(p,:)).*Psi0);
 end
 
-
+% calculate time dependence
 PSI_temp = zeros(length(t),length(x));
 PSI = zeros(length(t),length(x));
 
 for j = 1:length(d)
     for k = 1:length(t)
+        % create all of the time slices for a specific wavefunction
         PSI_temp(k,:) = d(j)*Psi(j,:).*exp(-1i*t(k)*En(j));
     end
     if j == 1 
@@ -176,6 +177,8 @@ for j = 1:length(d)
         PSI = PSI + PSI_temp;
     end
 end
+% plot over space and time to show how the quantum tunneling appears
+% between adjacent wells.
 PSI = PSI.';
 figure;
 imagesc([0,2],[0,L],abs(PSI).^2);
